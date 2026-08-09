@@ -96,7 +96,7 @@
         const roomId = sharedConfig.roomId || 'splitledger-main';
         const { data, error } = await sharedClient.from('splitledger_state').select('*').eq('room_id', roomId).maybeSingle();
         if (!error && data) {
-            deletedUsers = data.deleted_users || deletedUsers;
+            deletedUsers = Array.from(new Set([...deletedUsers, ...(data.deleted_users || [])]));
             users = (data.users || users).filter(u => !deletedUsers.includes(u.id));
             transactions = (data.transactions || transactions).filter(tx => !deletedUsers.includes(tx.paidBy) && !(tx.splitAmong || []).some(id => deletedUsers.includes(id)));
             settings = Object.assign({}, DEFAULT_SETTINGS, data.settings || {}); reminders = data.reminders || reminders;
@@ -105,7 +105,7 @@
         sharedClient.channel('splitledger-live').on('postgres_changes', { event: '*', schema: 'public', table: 'splitledger_state', filter: `room_id=eq.${roomId}` }, ({ new: next }) => {
             if (!next) return;
             suppressSharedSync = true;
-            deletedUsers = next.deleted_users || deletedUsers;
+            deletedUsers = Array.from(new Set([...deletedUsers, ...(next.deleted_users || [])]));
             users = (next.users || users).filter(u => !deletedUsers.includes(u.id));
             transactions = (next.transactions || transactions).filter(tx => !deletedUsers.includes(tx.paidBy) && !(tx.splitAmong || []).some(id => deletedUsers.includes(id)));
             settings = Object.assign({}, DEFAULT_SETTINGS, next.settings || {}); reminders = next.reminders || reminders;
