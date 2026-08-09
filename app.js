@@ -60,14 +60,51 @@
     function saveData() {
         localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users));
         localStorage.setItem(STORAGE_KEYS.transactions, JSON.stringify(transactions));
+        if (!suppressSharedSync) syncSharedState();
     }
 
     function saveSettings() {
         localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
+        if (!suppressSharedSync) syncSharedState();
     }
 
     function saveReminders() {
         localStorage.setItem(STORAGE_KEYS.reminders, JSON.stringify(reminders));
+        syncSharedState();
+    }
+
+    // Shared realtime backend. LocalStorage remains an offline cache until Supabase is configured.
+    const sharedConfig = window.SPLITLEDGEr_SUPABASE || {};
+    const sharedClient = sharedConfig.url && sharedConfig.anonKey && window.supabase
+        ? window.supabase.createClient(sharedConfig.url, sharedConfig.anonKey) : null;
+    let suppressSharedSync = false;
+    let syncTimer;
+    function syncSharedState() {
+        if (!sharedClient) return;
+        clearTimeout(syncTimer);
+        syncTimer = setTimeout(async () => {
+            const payload = { room_id: sharedConfig.roomId || 'splitledger-main', users, transactions, settings, reminders, updated_at: new Date().toISOString() };
+            const { error } = await sharedClient.from('splitledger_state').upsert(payload, { onConflict: 'room_id' });
+            if (error) console.warn('Shared sync failed:', error.message);
+        }, 250);
+    }
+    async function startSharedSync() {
+        if (!sharedClient) return;
+        const roomId = sharedConfig.roomId || 'splitledger-main';
+        const { data, error } = await sharedClient.from('splitledger_state').select('*').eq('room_id', roomId).maybeSingle();
+        if (!error && data) {
+            users = data.users || users; transactions = data.transactions || transactions;
+            settings = Object.assign({}, DEFAULT_SETTINGS, data.settings || {}); reminders = data.reminders || reminders;
+            saveData(); renderDashboard();
+        } else if (!error) syncSharedState();
+        sharedClient.channel('splitledger-live').on('postgres_changes', { event: '*', schema: 'public', table: 'splitledger_state', filter: `room_id=eq.${roomId}` }, ({ new: next }) => {
+            if (!next) return;
+            suppressSharedSync = true;
+            users = next.users || users; transactions = next.transactions || transactions;
+            settings = Object.assign({}, DEFAULT_SETTINGS, next.settings || {}); reminders = next.reminders || reminders;
+            saveData(); saveSettings(); saveReminders(); suppressSharedSync = false;
+            renderDashboard();
+        }).subscribe();
     }
 
     function getInitials(name) {
@@ -1125,5 +1162,6 @@
     saveData();
     saveSettings();
     renderDashboard();
+    startSharedSync();
 
 })();

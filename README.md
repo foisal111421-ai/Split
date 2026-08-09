@@ -20,15 +20,18 @@ Access the app at: `https://<your-username>.github.io/splitledger/`
 ## Tech Stack
 
 - Pure HTML5, CSS3, JavaScript (no frameworks)
-- LocalStorage for data persistence
+- Supabase Realtime for shared multi-client data, with LocalStorage offline fallback
 - GitHub Pages for hosting
 
 ## Getting Started
 
-1. Clone the repo
-2. Open `index.html` in your browser
-3. Go to **Settings** to configure your bKash number
-4. Start adding expenses!
+1. Create a Supabase project.
+2. Run `supabase-schema.sql` in Supabase SQL Editor.
+3. Enable realtime for `splitledger_state` in Database > Replication.
+4. Copy the project URL and anon key into `supabase-config.js`.
+5. Deploy the files to GitHub Pages and share the page link.
+
+Without Supabase credentials, the app automatically uses browser-local storage.
 
 ## License
 
