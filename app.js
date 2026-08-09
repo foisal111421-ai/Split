@@ -11,7 +11,8 @@
         users: 'sl_users',
         transactions: 'sl_transactions',
         settings: 'sl_settings',
-        reminders: 'sl_reminders'
+        reminders: 'sl_reminders',
+        deletedUsers: 'sl_deleted_users'
     };
 
     const CATEGORY_ICONS = {
@@ -45,6 +46,7 @@
     let transactions = loadData(STORAGE_KEYS.transactions) || [];
     let settings = Object.assign({}, DEFAULT_SETTINGS, loadData(STORAGE_KEYS.settings) || {});
     let reminders = loadData(STORAGE_KEYS.reminders) || {};
+    let deletedUsers = loadData(STORAGE_KEYS.deletedUsers) || [];
 
     function uid() {
         return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
@@ -60,6 +62,7 @@
     function saveData() {
         localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users));
         localStorage.setItem(STORAGE_KEYS.transactions, JSON.stringify(transactions));
+        localStorage.setItem(STORAGE_KEYS.deletedUsers, JSON.stringify(deletedUsers));
         if (!suppressSharedSync) syncSharedState();
     }
 
@@ -83,7 +86,7 @@
         if (!sharedClient) return;
         clearTimeout(syncTimer);
         syncTimer = setTimeout(async () => {
-            const payload = { room_id: sharedConfig.roomId || 'splitledger-main', users, transactions, settings, reminders, updated_at: new Date().toISOString() };
+            const payload = { room_id: sharedConfig.roomId || 'splitledger-main', users, transactions, settings, reminders, deleted_users: deletedUsers, updated_at: new Date().toISOString() };
             const { error } = await sharedClient.from('splitledger_state').upsert(payload, { onConflict: 'room_id' });
             if (error) console.warn('Shared sync failed:', error.message);
         }, 250);
@@ -93,14 +96,18 @@
         const roomId = sharedConfig.roomId || 'splitledger-main';
         const { data, error } = await sharedClient.from('splitledger_state').select('*').eq('room_id', roomId).maybeSingle();
         if (!error && data) {
-            users = data.users || users; transactions = data.transactions || transactions;
+            deletedUsers = data.deleted_users || deletedUsers;
+            users = (data.users || users).filter(u => !deletedUsers.includes(u.id));
+            transactions = (data.transactions || transactions).filter(tx => !deletedUsers.includes(tx.paidBy) && !(tx.splitAmong || []).some(id => deletedUsers.includes(id)));
             settings = Object.assign({}, DEFAULT_SETTINGS, data.settings || {}); reminders = data.reminders || reminders;
             saveData(); renderDashboard();
         } else if (!error) syncSharedState();
         sharedClient.channel('splitledger-live').on('postgres_changes', { event: '*', schema: 'public', table: 'splitledger_state', filter: `room_id=eq.${roomId}` }, ({ new: next }) => {
             if (!next) return;
             suppressSharedSync = true;
-            users = next.users || users; transactions = next.transactions || transactions;
+            deletedUsers = next.deleted_users || deletedUsers;
+            users = (next.users || users).filter(u => !deletedUsers.includes(u.id));
+            transactions = (next.transactions || transactions).filter(tx => !deletedUsers.includes(tx.paidBy) && !(tx.splitAmong || []).some(id => deletedUsers.includes(id)));
             settings = Object.assign({}, DEFAULT_SETTINGS, next.settings || {}); reminders = next.reminders || reminders;
             saveData(); saveSettings(); saveReminders(); suppressSharedSync = false;
             renderDashboard();
@@ -595,6 +602,7 @@
             navigateTo('dashboard');
         } else if (pendingDeleteUserId) {
             users = users.filter(u => u.id !== pendingDeleteUserId);
+            deletedUsers = Array.from(new Set([...deletedUsers, pendingDeleteUserId]));
             transactions = transactions.filter(tx => {
                 tx.splitAmong = tx.splitAmong.filter(id => id !== pendingDeleteUserId);
                 if (tx.paidBy === pendingDeleteUserId || tx.splitAmong.length === 0) return false;

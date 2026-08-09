@@ -1,5 +1,7 @@
+// Paste the values from Supabase Project Settings > API.
+// The anon key is safe to expose in a browser; never put a service_role key here.
 window.SPLITLEDGEr_SUPABASE = {
-    url: 'https://rxfrskjxnyxjnijycfjw.supabase.co',
-    anonKey: 'sb_publishable_Ql5Kve7mae3TD-ELa2SyGA_2iOFpJlx',
+    url: '',
+    anonKey: '',
     roomId: 'splitledger-main'
 };

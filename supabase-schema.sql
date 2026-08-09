@@ -4,6 +4,7 @@ create table if not exists public.splitledger_state (
   transactions jsonb not null default '[]'::jsonb,
   settings jsonb not null default '{}'::jsonb,
   reminders jsonb not null default '{}'::jsonb,
+  deleted_users jsonb not null default '[]'::jsonb,
   updated_at timestamptz not null default now()
 );
 
@@ -13,4 +14,5 @@ create policy "Anyone with the app link can create" on public.splitledger_state 
 create policy "Anyone with the app link can update" on public.splitledger_state for update using (true) with check (true);
 
 alter table public.splitledger_state replica identity full;
+alter table public.splitledger_state add column if not exists deleted_users jsonb not null default '[]'::jsonb;
 -- In Supabase Dashboard: Database > Replication, enable this table for realtime.
