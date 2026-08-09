@@ -1,0 +1,7 @@
+{
+    "bkashNumber": "",
+    "bkashName": "",
+    "reminderMessage": "Hi {name}, you have an outstanding balance of ৳{amount} BDT. Please settle via bKash to {bkash_number} ({bkash_name}). Thank you!",
+    "reminderDays": 7,
+    "autoSend": false
+}

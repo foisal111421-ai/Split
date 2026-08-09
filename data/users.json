@@ -1,0 +1,12 @@
+[
+    { "name": "Alice Johnson", "email": "alice@example.com", "phone": "+880 1711-000101", "color": "#6C63FF" },
+    { "name": "Bob Smith", "email": "bob@example.com", "phone": "+880 1711-000102", "color": "#48CFCB" },
+    { "name": "Charlie Davis", "email": "charlie@example.com", "phone": "+880 1711-000103", "color": "#FF6B6B" },
+    { "name": "Diana Lee", "email": "diana@example.com", "phone": "+880 1711-000104", "color": "#FFA94D" },
+    { "name": "Ethan Brown", "email": "ethan@example.com", "phone": "+880 1711-000105", "color": "#51CF66" },
+    { "name": "Fiona Garcia", "email": "fiona@example.com", "phone": "+880 1711-000106", "color": "#FF8ED4" },
+    { "name": "George Wilson", "email": "george@example.com", "phone": "+880 1711-000107", "color": "#339AF0" },
+    { "name": "Hannah Martinez", "email": "hannah@example.com", "phone": "+880 1711-000108", "color": "#FCC419" },
+    { "name": "Ivan Taylor", "email": "ivan@example.com", "phone": "+880 1711-000109", "color": "#6C63FF" },
+    { "name": "Julia Anderson", "email": "julia@example.com", "phone": "+880 1711-000110", "color": "#48CFCB" }
+]

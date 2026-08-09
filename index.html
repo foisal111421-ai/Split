@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SplitLedger — Smart Account Management (BDT)</title>
+    <meta name="description" content="SplitLedger: A modern account management app for splitting expenses among groups, tracking balances, and managing shared costs effortlessly.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Ambient Background -->
+    <div class="ambient-bg">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <rect x="2" y="2" width="24" height="24" rx="6" stroke="url(#brandGrad)" stroke-width="2.5"/>
+                    <path d="M9 10h10M9 14h10M9 18h6" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="brandGrad" x1="2" y1="2" x2="26" y2="26">
+                            <stop stop-color="#6C63FF"/>
+                            <stop offset="1" stop-color="#48CFCB"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <span class="brand-name">SplitLedger</span>
+        </div>
+
+        <ul class="nav-links">
+            <li>
+                <a href="#" class="nav-link active" data-page="dashboard" id="nav-dashboard">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-page="users" id="nav-users">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-page="add-expense" id="nav-add-expense">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    <span>Add Expense</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-page="transactions" id="nav-transactions">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    <span>Transactions</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-page="settlements" id="nav-settlements">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <span>Settlements</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-page="settings" id="nav-settings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <button id="btn-reset-data" class="btn-reset" title="Reset All Data">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                <span>Reset Data</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Nav Toggle -->
+    <button id="mobile-toggle" class="mobile-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+    </button>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="main-content">
+
+        <!-- ===== DASHBOARD PAGE ===== -->
+        <section id="page-dashboard" class="page active">
+            <header class="page-header">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p class="page-subtitle">Overview of all accounts and recent activity</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="btn-quick-expense">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Quick Expense
+                    </button>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card stat-total">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Users</span>
+                        <span class="stat-value" id="stat-total-users">0</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-expenses">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Expenses</span>
+                        <span class="stat-value" id="stat-total-expenses">$0.00</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-transactions">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Transactions</span>
+                        <span class="stat-value" id="stat-total-transactions">0</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-settled">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Unsettled</span>
+                        <span class="stat-value" id="stat-unsettled">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Cards Grid -->
+            <div class="section-header">
+                <h2>Account Balances</h2>
+                <p>Click any user to view their detailed ledger</p>
+            </div>
+            <div class="accounts-grid" id="accounts-grid">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="section-header" style="margin-top: 2rem;">
+                <h2>Recent Transactions</h2>
+                <a href="#" class="link-view-all" data-page="transactions">View All →</a>
+            </div>
+            <div class="transactions-list" id="recent-transactions">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- ===== USERS PAGE ===== -->
+        <section id="page-users" class="page">
+            <header class="page-header">
+                <div>
+                    <h1>User Management</h1>
+                    <p class="page-subtitle">Create, edit, and manage user accounts</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="btn-add-user">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add User
+                    </button>
+                </div>
+            </header>
+
+            <div class="users-table-wrap">
+                <table class="users-table" id="users-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Balance</th>
+                            <th>Transactions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <div id="users-empty" class="empty-state" style="display: none;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <h3>No users yet</h3>
+                    <p>Start by adding your first user account</p>
+                    <button class="btn btn-primary" id="btn-add-user-empty">Add First User</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ADD EXPENSE PAGE ===== -->
+        <section id="page-add-expense" class="page">
+            <header class="page-header">
+                <div>
+                    <h1>Add Expense</h1>
+                    <p class="page-subtitle">Log a new expense and split it among users</p>
+                </div>
+            </header>
+
+            <div class="form-card">
+                <form id="expense-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expense-description">Description</label>
+                            <input type="text" id="expense-description" placeholder="e.g. Bought snacks for everyone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-category">Category</label>
+                            <select id="expense-category">
+                                <option value="food">🍕 Food & Drinks</option>
+                                <option value="transport">🚗 Transport</option>
+                                <option value="shopping">🛒 Shopping</option>
+                                <option value="entertainment">🎬 Entertainment</option>
+                                <option value="utilities">💡 Utilities</option>
+                                <option value="rent">🏠 Rent</option>
+                                <option value="health">💊 Health</option>
+                                <option value="education">📚 Education</option>
+                                <option value="travel">✈️ Travel</option>
+                                <option value="other">📦 Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expense-amount">Total Amount ($)</label>
+                            <input type="number" id="expense-amount" placeholder="0.00" min="0.01" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expense-paid-by">Paid By</label>
+                            <select id="expense-paid-by" required>
+                                <option value="">Select who paid</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expense-date">Date</label>
+                        <input type="date" id="expense-date">
+                    </div>
+
+                    <div class="form-group split-section">
+                        <label>Split Among</label>
+                        <div class="split-controls">
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-select-all">Select All</button>
+                            <button type="button" class="btn btn-outline btn-sm" id="btn-deselect-all">Deselect All</button>
+                        </div>
+                        <div class="split-users-grid" id="split-users-grid">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="split-summary" id="split-summary" style="display: none;">
+                            <span>Each person pays: </span>
+                            <strong id="split-amount">$0.00</strong>
+                            <span> (split among <strong id="split-count">0</strong> people)</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expense-notes">Notes (optional)</label>
+                        <textarea id="expense-notes" rows="3" placeholder="Any additional notes..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="reset" class="btn btn-outline">Clear</button>
+                        <button type="submit" class="btn btn-primary btn-lg" id="btn-submit-expense">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Log Expense
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ===== TRANSACTIONS PAGE ===== -->
+        <section id="page-transactions" class="page">
+            <header class="page-header">
+                <div>
+                    <h1>Transaction History</h1>
+                    <p class="page-subtitle">All logged expenses and their splits</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="search-transactions" placeholder="Search transactions...">
+                    </div>
+                    <select id="filter-category" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="food">🍕 Food & Drinks</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="shopping">🛒 Shopping</option>
+                        <option value="entertainment">🎬 Entertainment</option>
+                        <option value="utilities">💡 Utilities</option>
+                        <option value="rent">🏠 Rent</option>
+                        <option value="health">💊 Health</option>
+                        <option value="education">📚 Education</option>
+                        <option value="travel">✈️ Travel</option>
+                        <option value="other">📦 Other</option>
+                    </select>
+                </div>
+            </header>
+
+            <div class="transactions-list full-list" id="all-transactions">
+                <!-- Populated by JS -->
+            </div>
+            <div id="transactions-empty" class="empty-state" style="display: none;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <h3>No transactions yet</h3>
+                <p>Add your first expense to get started</p>
+                <button class="btn btn-primary" id="btn-add-expense-empty">Add Expense</button>
+            </div>
+        </section>
+
+        <!-- ===== SETTLEMENTS PAGE ===== -->
+        <section id="page-settlements" class="page">
+            <header class="page-header">
+                <div>
+                    <h1>Settlements</h1>
+                    <p class="page-subtitle">See who owes whom and settle debts</p>
+                </div>
+                <div class="header-actions reminder-config-bar">
+                    <div class="form-group inline-group">
+                        <label for="reminder-date">Auto-remind after</label>
+                        <input type="date" id="reminder-date">
+                    </div>
+                    <div class="form-group inline-group toggle-group">
+                        <label for="auto-send-toggle" class="toggle-label">
+                            <input type="checkbox" id="auto-send-toggle">
+                            <span>Auto-send</span>
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" id="btn-send-all-reminders">Send All Reminders</button>
+                </div>
+            </header>
+
+            <div id="reminder-bar"></div>
+
+            <div class="settlements-list" id="settlements-list">
+                <!-- Populated by JS -->
+            </div>
+            <div id="settlements-empty" class="empty-state" style="display: none;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <h3>All settled up!</h3>
+                <p>No outstanding balances between users</p>
+            </div>
+        </section>
+
+        <!-- ===== SETTINGS PAGE ===== -->
+        <section id="page-settings" class="page">
+            <header class="page-header">
+                <div>
+                    <h1>Settings</h1>
+                    <p class="page-subtitle">Configure your account and payment details</p>
+                </div>
+            </header>
+
+            <div class="form-card">
+                <form id="settings-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="settings-bkash">bKash Number</label>
+                            <input type="text" id="settings-bkash" placeholder="+880 1XXX-XXXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-bkash-name">bKash Account Name</label>
+                            <input type="text" id="settings-bkash-name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="settings-reminder-days">Send reminder after (days)</label>
+                        <input type="number" id="settings-reminder-days" value="7">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="settings-reminder-msg">Default Reminder Message</label>
+                        <textarea id="settings-reminder-msg" rows="4">Hi {name}, you have an outstanding balance of {amount} BDT. Please settle via bKash to {bkash_number} ({bkash_name}). Thank you!</textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg" id="btn-save-settings">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Data Management -->
+            <div class="form-card" style="margin-top: 20px; max-width: 720px;">
+                <div class="section-header" style="margin-bottom: 16px;">
+                    <h2>📁 Data Management</h2>
+                    <p>Export or import your data as JSON files</p>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 16px;">
+                    All data is stored in the <code style="background:var(--bg-input);padding:2px 6px;border-radius:4px;font-size:0.82rem;">data/</code> folder as JSON files. Use the buttons below to download a backup or restore from a file.
+                </p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="btn-export-data">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export All Data
+                    </button>
+                    <button class="btn btn-outline" id="btn-import-data">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Import Data
+                    </button>
+                    <button class="btn btn-outline" id="btn-export-users">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                        Export Users Only
+                    </button>
+                    <button class="btn btn-outline" id="btn-export-transactions">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        Export Transactions
+                    </button>
+                </div>
+                <input type="file" id="import-file-input" accept=".json" style="display: none;">
+            </div>
+        </section>
+
+        <!-- ===== USER DETAIL PAGE ===== -->
+        <section id="page-user-detail" class="page">
+            <header class="page-header">
+                <div>
+                    <button class="btn-back" id="btn-back-dashboard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        Back
+                    </button>
+                    <h1 id="detail-user-name">User Name</h1>
+                    <p class="page-subtitle" id="detail-user-email">user@email.com</p>
+                </div>
+            </header>
+
+            <div class="detail-stats" id="detail-stats">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="section-header">
+                <h2>Transaction Ledger</h2>
+            </div>
+            <div class="transactions-list" id="detail-transactions">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- User Modal (Create/Edit) -->
+    <div class="modal-overlay" id="modal-user">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-user-title">Add New User</h2>
+                <button class="modal-close" id="modal-user-close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="user-form">
+                <input type="hidden" id="user-edit-id">
+                <div class="form-group">
+                    <label for="user-name">Full Name *</label>
+                    <input type="text" id="user-name" placeholder="e.g. John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-email">Email</label>
+                    <input type="email" id="user-email" placeholder="e.g. john@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="user-phone">Phone</label>
+                    <input type="tel" id="user-phone" placeholder="e.g. +1 234 567 890">
+                </div>
+                <div class="form-group">
+                    <label>Avatar Color</label>
+                    <div class="color-picker" id="color-picker">
+                        <label class="color-option"><input type="radio" name="user-color" value="#6C63FF" checked><span style="background:#6C63FF"></span></label>
+                        <label class="color-option"><input type="radio" name="user-color" value="#48CFCB"><span style="background:#48CFCB"></span></label>
+                        <label class="color-option"><input type="radio" name="user-color" value="#FF6B6B"><span style="background:#FF6B6B"></span></label>
+                        <label class="color-option"><input type="radio" name="user-color" value="#FFA94D"><span style="background:#FFA94D"></span></label>
+                        <label class="color-option"><input type="radio" name="user-color" value="#51CF66"><span style="background:#51CF66"></span></label>
+                        <label class="color-option"><input type="radio" name="user-color" value="#FF8ED4"><span style="background:#FF8ED4"></span></label>
+                        <label class="color-option"><input type="radio" name="user-color" value="#339AF0"><span style="background:#339AF0"></span></label>
+                        <label class="color-option"><input type="radio" name="user-color" value="#FCC419"><span style="background:#FCC419"></span></label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="modal-user-cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-user">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay" id="modal-confirm">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h2>Confirm Delete</h2>
+                <button class="modal-close" id="modal-confirm-close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <p id="confirm-message">Are you sure you want to delete this item?</p>
+            <div class="form-actions">
+                <button class="btn btn-outline" id="modal-confirm-cancel">Cancel</button>
+                <button class="btn btn-danger" id="modal-confirm-ok">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
